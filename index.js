@@ -2,10 +2,10 @@
 
 var AWS = require('aws-sdk');
 var s3 = new AWS.S3();
-
 var bucketName = process.env.BUCKET;
+var simpleParser = require('mailparser').simpleParser;
 
-exports.handler = function (event, context, callback) {
+module.exports.handler = function (event, context, callback) {
     console.log('Process email');
     console.log(event.Records[0]);
     var s3Object = event.Records[0].s3.object;
@@ -17,7 +17,6 @@ exports.handler = function (event, context, callback) {
         Key: s3Object.key
     };
 
-    console.log("req:", req);
     s3.getObject(req, function (err, data) {
         if (err) {
             console.log(err, err.stack);
@@ -26,8 +25,19 @@ exports.handler = function (event, context, callback) {
             console.log("Raw email:\n" + data.Body);
 
             // Custom email processing goes here
-
-            callback(null, null);
+            simpleParser(data.Body, (err, parsed) => {
+                if (err) {
+                    console.log(err, err.stack);
+                    callback(err);
+                } else {
+                    console.log("date:", parsed.date);
+                    console.log("subject:", parsed.subject);
+                    console.log("body:", parsed.text);
+                    console.log("from:", parsed.from.text);
+                    console.log("attachments:", parsed.attachments);
+                    callback(null, null);
+                }
+            });
         }
     });
 };

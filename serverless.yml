@@ -8,27 +8,13 @@ provider:
   stage: dev
   region: us-east-1
   environment:
-    BUCKET: mails-cloudly.tech
-    ACCOUNT_ID: 811338114639
-
+    BUCKET: mail-cloudly.tech
 
   iamRoleStatements:
   - Effect: Allow
     Action:
     - s3:*
     Resource: "*"
-#
-#  iamRoleStatements:
-#  - Effect: "Allow"
-#    Action:
-#    - s3:*
-##    - s3:GetBucketLocation
-#    Resource: "arn:aws:s3:::${self:provider.environment.BUCKET}"
-##  - Effect: "Allow"
-##    Action:
-##    - s3:GetObject
-##    - s3:GetObjectAcl
-##    Resource: "arn:aws:s3:::${self:provider.environment.BUCKET}"
 
 functions:
   receiveEmail:
@@ -36,17 +22,3 @@ functions:
     events:
     - s3: ${self:provider.environment.BUCKET}
 
-
-#Resources:
-#  ReceiveEmailPermissionEmailsS3:
-#    Type: "AWS::Lambda::Permission"
-#    Properties:
-#      FunctionName:
-#        "Fn::GetAtt":
-#        - ReceiveEmailLambdaFunction
-#        - Arn
-#      Principal: "s3.amazonaws.com"
-#      Action: "lambda:InvokeFunction"
-#      SourceAccount:
-#        Ref: AWS::${self:provider.environment.ACCOUNT_ID}
-#      SourceArn: "arn:aws:s3:::${env:BUCKET}"
